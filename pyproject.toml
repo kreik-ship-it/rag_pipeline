@@ -1,19 +1,62 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "rag-project"
-version = "0.1.0"
-description = "Add your description here"
+name = "energy-rag"
+version = "1.0.0"
+description = "Retrieval-Augmented Generation über deutsche Energiemarkt-Studien: Hybrid-Suche, Reranking, Quellenangaben und Evaluation"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.11"
 dependencies = [
-    "chromadb>=1.5.9",
-    "faiss-cpu>=1.15.0",
-    "ipykernel>=7.3.0",
-    "langchain>=1.4.0",
-    "langchain-community>=0.4.2",
-    "langchain-core>=1.6.2",
-    "numpy>=2.5.3",
-    "pymupdf>=1.28.2",
-    "pypdf>=6.18.0",
-    "scikit-learn>=1.9.0",
-    "sentence-transformers>=6.0.1",
+    "anthropic>=0.70",
+    "chromadb>=1.0",
+    "langchain-text-splitters>=0.3",
+    "numpy>=1.26",
+    "pymupdf>=1.24",
+    "python-dotenv>=1.0",
+    "rank-bm25>=0.2.2",
+    "sentence-transformers>=3.0",
 ]
+
+[project.optional-dependencies]
+ui = [
+    "streamlit>=1.38",
+]
+notebook = [
+    "ipykernel>=6.29",
+    "matplotlib>=3.8",
+    "nbclient>=0.10",
+    "nbformat>=5.10",
+    "pandas>=2.2",
+]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5",
+]
+
+[project.scripts]
+energy-rag = "energy_rag.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+filterwarnings = [
+    "ignore::DeprecationWarning:langsmith.*",
+    "ignore::DeprecationWarning:chromadb.*",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["notebooks", "scratch"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# Notebook-Zellen als Strings: lange Codezeilen sind dort lesbarer als umbrochene.
+"scripts/build_notebook.py" = ["E501"]
